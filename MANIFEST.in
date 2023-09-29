@@ -1,0 +1,1 @@
+recursive-include streamlit_local_storage/frontend/build *
