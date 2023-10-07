@@ -4,120 +4,75 @@ import {
   withStreamlitConnection,
   ComponentProps
 } from "streamlit-component-lib"
-import React, { useEffect } from "react"
+import React, { useEffect, useMemo, useState } from "react"
+import useLocalStorageState from 'use-local-storage-state'
 
-const LocalStorageComponent:React.FC<ComponentProps> = (props) => {
+const LocalStorageComponent:React.FC<ComponentProps> = (props:any) => {
 
-  const { args } = props
-  
-  const saveItems = (items:any) => {
-    if (items.length > 0){
-      items.map((obj:any) => {
-        localStorage.setItem(obj.key, JSON.stringify(obj.toStore));
-      })
-      return true
-    }
-  }
+  const { args } = props 
+  const method:any = args["method"]
+  const itemKey:any = args["itemKey"]
+  const itemValue:any = args["itemValue"]
+  const localStrageOptions:any = args["localStrageOptions"] || { defaultValue: null }
+  const [todos, setTodos, {removeItem, isPersistent}] = useLocalStorageState<any>(itemKey, localStrageOptions)
 
-  const saveItem = (itemKey:any, itemValue:any) => {
-    localStorage.setItem(itemKey, JSON.stringify(itemValue))
-    return true
-  }
-
-  const getItemsList = (items:any) => {
-    if (items.length > 0){
-
-      const toSendToStreamlit:any[] = []
-      items.map((obj:any) => {
-        const saved:any = localStorage.getItem(obj.key)
-        const initial = JSON.parse(saved)
-        toSendToStreamlit.push({"key":obj.key, "stored": initial}) 
-      })
-      return toSendToStreamlit
-    }
-  }
-  
-
-  const getItem_ = (itemKey:any) => {
-    const saved:any = localStorage.getItem(itemKey)
-    const initial = JSON.parse(saved)
-    return initial
-  }
-
-  const deleteItemsList = (items:any) => {
-    if (items.length > 0 ) {
-      items.map((obj:any) => {
-        localStorage.removeItem(obj.key)
-      })
-      return true
-    }
-  }
-
-  const deleteItem = (itemKey:any) => {
-      localStorage.removeItem(itemKey)
-      return true
-  }
+  const setItemF = (itemKey:any, itemValue:any) => {
+    let toSave = {item:itemKey, value:itemValue}
+    setTodos(toSave)
+  }  
 
   const deleteAll = () => {
     localStorage.clear();
     return true
-}
+  }
 
-const getAll = () => {
-  const toSendToStreamlit = {...localStorage}
-  return toSendToStreamlit
-}
+  const getAll = () => {
+    const toSendToStreamlit = {...localStorage}
+    return toSendToStreamlit
+  }
 
-  const method = args["method"]
-
-  useEffect(() => { 
+  useEffect(() => {
     
-    let output = null
-    const items = args["items"]
-    const itemKey = args["itemKey"]
-    const itemValue = args["itemValue"]
+    switch(method){
+      case "getItem":
 
-    switch(method) {
-      case "setList":
-        output = saveItems(items)  
-        break
-      case "set":
-        output = saveItem(itemKey, itemValue)
-        break
-      case "getList":
-        output = getItemsList(items)
-        Streamlit.setComponentValue(output)
+        Streamlit.setComponentValue({"storage":todos, "dataPersist":isPersistent})
         Streamlit.setComponentReady()
+       
         break
-      case "get":
-        output = getItem_(itemKey)
-        Streamlit.setComponentValue(output)
-        Streamlit.setComponentReady()
-        break
-      case "deleteList":
-        output = deleteItemsList(items)
+      case "setItem":
+
+        setItemF(itemKey, itemValue)
         break
       case "deleteItem":
-        output = deleteItem(itemKey)
+
+        removeItem()
         break
+      
       case "deleteAll":
-        output = deleteAll()
+        deleteAll()
         break
+      
       case "getAll":
-        output = getAll()
-        Streamlit.setComponentValue(output)
+        const allStored = getAll()
+        Streamlit.setComponentValue(allStored)
         Streamlit.setComponentReady()
+        break
+
+      default:
         break
     }
 
-    
 
-  }, [method])
-
-
-  return (      
-        <div style={{display:"none"}}></div>
+  }, [method, setTodos, todos])
+  
+  
+  return ( 
+    <div style={{display:"none"}} >
+    </div>     
   )
 }
 
 export default withStreamlitConnection(LocalStorageComponent)
+
+
