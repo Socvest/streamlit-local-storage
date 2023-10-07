@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name="streamlit-local-storage",
-    version="0.0.4",
+    version="0.0.11",
     author="",
     author_email="",
     description="Streamlit component that allows you to do manage local storage",
