@@ -1,4 +1,7 @@
 import os
+from dataclasses import dataclass
+from typing import Literal, Optional, Union
+import streamlit as st
 import streamlit.components.v1 as components
 
 _RELEASE = True
@@ -18,87 +21,85 @@ else:
 
 
 class LocalStorage:
+    """
+    Component to help manager local storage for streamlit apps
+    """
 
     def __init__(self):
         self.localStorageManager = _st_local_storage
+            
+    def setItem(self, itemKey:str=None, itemValue:Union[str, int, float, bool]=None, key:str="set"):
+        """
+        Set individual items to local storage with a given name (itemKey) and value (itemValue)
 
-    def setList(self, items:list = None, key:str="setList"):
-        if items is None or items == "" or len(items) == 0:
-            return
-        
-        try:
-            self.localStorageManager(method="setList", items=items, key=key)
-            return True
-        except:
-            return False
-    
-    def set(self, itemKey:str=None, itemValue:any=None, key:str="set"):
+        Args:
+            itemKey: Name of the item to set
+            itemValue: The value to save. Can be string, int, float, bool, dict, json but will be stored as a string
+        """
 
         if (itemKey is None or itemKey == "") or (itemValue is None or itemValue == ""):
             return
         
         try:
-            self.localStorageManager(method="set", itemKey=itemKey, itemValue=itemValue, key=key)
+            self.localStorageManager(method="setItem", itemKey=itemKey, itemValue=itemValue, key=key)
             return True
         except:
-            return False
-    
-    def getList(self, items:list=None, key:str="getList"):
-
-        if items is None or items == "" or len(items) == 0:
-            return
+            return False   
         
-        try:
-            saved_list = self.localStorageManager(method="getList", items=items, key=key) 
-            return saved_list
-        except:
-            return False
-    
-    def get(self, itemKey:any=None, key:str="get"):
+    def deleteItem(self, itemKey:str, key:str="deleteItem"): 
+        """
+        Delete individual item from local storage
+
+        Args:
+            itemKey: item key to delete from local storage
+            key: unique identifier for the function/method in case you wish to execute it again somewhere else in the app.
+        """
 
         if itemKey is None or itemKey == "":
             return
         
-        try:
-            saved_key = self.localStorageManager(method="get", itemKey=itemKey, key=key) 
-            return saved_key
-        except:
-            return False
+        self.localStorageManager(method="deleteItem", itemKey=itemKey, key=key) 
+        
+        return True
     
-    def deleteList(self, items:list=None, key:str="deleteList"): 
+    def getItem(self, itemKey:str=None, key:str="get"):
+        """
+        Get individual items stored in local storage.
 
-        if items is None or items == "" or len(items) == 0:
-            return
-        
-        try:
-            saved_key = self.localStorageManager(method="deleteList", items=items, key=key) 
-            return saved_key
-        except:
-            return False
-        
-    def deleteItem(self, itemKey:any, key:str="deleteItem"): 
+        Args:
+            itemKey: name of item to get from local storage
+        """
 
         if itemKey is None or itemKey == "":
             return
         
-        try:
-            saved_key = self.localStorageManager(method="deleteItem", itemKey=itemKey, key=key) 
-            return saved_key
-        except:
-            return False
-    
-    def deleteAll(self, key:str="deleteAll"):
-
-        try:
-            saved_key = self.localStorageManager(method="deleteAll", key=key) 
-            return saved_key
-        except:
-            return False
+        saved_key = self.localStorageManager(method="getItem", itemKey=itemKey, key=key) 
+        return saved_key
         
     def getAll(self, key:str="getAll"):
+        """
+        Get all items saved on local storage.
 
-        try:
-            saved_key = self.localStorageManager(method="getAll", key=key) 
-            return saved_key
-        except:
-            return False
+        Args:
+            key: unique identifier for the function/method in case you wish to execute it again somewhere else in the app.
+        """
+
+        saved_key = self.localStorageManager(method="getAll", key=key)
+        return saved_key
+        
+    def deleteAll(self, key:str="deleteAll"):
+        """
+        Delete all items you saved on local storage
+
+        Args:
+            key: unique identifier for the function/method in case you wish to execute it again somewhere else in the app.
+        """
+
+        self.localStorageManager(method="deleteAll", key=key) 
+
+       
+        
+    
+   
+    
+    
