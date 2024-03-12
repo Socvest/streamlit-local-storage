@@ -17,6 +17,8 @@ pip install streamlit-local-storage
 ```
 from streamlit_local_storage import LocalStorage
 
+localS = LocalStorage()
+
 itemKey = "camera"
 itemValue = "Tarah"
 localS.setItem(itemKey, itemValue)
