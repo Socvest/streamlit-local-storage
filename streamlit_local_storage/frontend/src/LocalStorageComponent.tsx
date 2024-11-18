@@ -31,11 +31,35 @@ const LocalStorageComponent: React.FC<ComponentProps> = (props: any) => {
     localStorage.removeItem(itemKey)
   }
 
-  const getAll = () => {
-    const toSendToStreamlit = { ...localStorage }
+    const getAll = () => {
+    const allKeys = Object.keys(localStorage);
+    const results = { ...localStorage };
+    const updatedLocalStorage: any = {};
+  
+    allKeys.forEach((key: string) => {
+      try {
+        const value = results[key];
+        const parsedValue = JSON.parse(value);
+        
+        if (parsedValue !== null && typeof parsedValue === 'object' && key in parsedValue) {
+          updatedLocalStorage[key] = parsedValue[key];
+        } else {
+          updatedLocalStorage[key] = parsedValue;
+        }
+      } catch (error) {
+        // If JSON parsing fails, store the original string value
+        updatedLocalStorage[key] = results[key];
+      }
+    });
+  
+    setAllLocalStorage(updatedLocalStorage);
+    return updatedLocalStorage;
+  };
 
-    return toSendToStreamlit
-  }
+  useEffect(() => {
+
+    Streamlit.setFrameHeight(0)
+  })
 
   useEffect(() => {
 
