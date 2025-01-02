@@ -99,5 +99,20 @@ st.write(st.session_state["get_val_2"])
 
 ```
 
+### If using st.rerun() with st.setItem()
+
+```
+import time
+
+def LocalStorageManager():
+    return LocalStorage()
+localS = LocalStorageManager()
+
+btn_set = st.button("set item")
+if btn_set:
+    localS.setItem("hello", "world")
+    time.sleep(1.5)
+```
+
 
 Remember to refresh browser if it does not pop up instantly in local storage. 
